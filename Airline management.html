@@ -1,0 +1,2083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Airways Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        dark: {
+                            900: '#0f172a',
+                            800: '#1e293b',
+                            700: '#334155',
+                            600: '#475569',
+                            500: '#64748b',
+                        },
+                        sky: {
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                        },
+                        jet: {
+                            500: '#1e293b',
+                            600: '#0f172a',
+                        },
+                        quantum: {
+                            primary: '#6d28d9',
+                            secondary: '#8b5cf6',
+                            accent: '#a78bfa',
+                            dark: '#1e1b4b',
+                            light: '#f5f3ff'
+                        }
+                    },
+                    boxShadow: {
+                        'glass': '0 4px 30px rgba(0, 0, 0, 0.1)',
+                        'neon': '0 0 10px rgba(109, 40, 217, 0.7)',
+                        'neon-purple': '0 0 15px rgba(167, 139, 250, 0.7)',
+                    },
+                    backdropBlur: {
+                        xs: '2px',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+        }
+        
+        h1, h2, h3, h4, .tech-font {
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 0.05em;
+        }
+        
+        .glass-card {
+            background: rgba(30, 27, 75, 0.7);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(167, 139, 250, 0.1);
+        }
+        
+        .sidebar-glass {
+            background: rgba(30, 27, 75, 0.9);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-right: 1px solid rgba(167, 139, 250, 0.1);
+        }
+        
+        .neon-text {
+            text-shadow: 0 0 8px rgba(167, 139, 250, 0.7);
+        }
+        
+        .neon-border {
+            border: 1px solid rgba(167, 139, 250, 0.3);
+            box-shadow: 0 0 10px rgba(167, 139, 250, 0.3);
+        }
+        
+        .neon-border-purple {
+            border: 1px solid rgba(167, 139, 250, 0.5);
+            box-shadow: 0 0 15px rgba(167, 139, 250, 0.3);
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(167, 139, 250, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(167, 139, 250, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(167, 139, 250, 0);
+            }
+        }
+        
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        .flight-card:hover {
+            transform: translateY(-5px);
+            transition: transform 0.3s ease;
+        }
+        
+        .dashboard-card:hover {
+            transform: scale(1.02);
+            transition: transform 0.3s ease;
+            box-shadow: 0 0 15px rgba(167, 139, 250, 0.3);
+        }
+        
+        .hexagon {
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+        }
+        
+        .runway {
+            background: linear-gradient(90deg, #1e1b4b 0%, #6d28d9 50%, #1e1b4b 100%);
+            background-size: 200% 100%;
+            animation: runway 3s linear infinite;
+        }
+        
+        @keyframes runway {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .status-badge i {
+            margin-right: 0.25rem;
+        }
+        
+        .on-time {
+            background-color: rgba(74, 222, 128, 0.1);
+            color: #4ade80;
+            border: 1px solid rgba(74, 222, 128, 0.3);
+        }
+        
+        .delayed {
+            background-color: rgba(250, 204, 21, 0.1);
+            color: #facc15;
+            border: 1px solid rgba(250, 204, 21, 0.3);
+        }
+        
+        .boarding {
+            background-color: rgba(96, 165, 250, 0.1);
+            color: #60a5fa;
+            border: 1px solid rgba(96, 165, 250, 0.3);
+        }
+        
+        .scheduled {
+            background-color: rgba(156, 163, 175, 0.1);
+            color: #9ca3af;
+            border: 1px solid rgba(156, 163, 175, 0.3);
+        }
+        
+        .active {
+            background-color: rgba(74, 222, 128, 0.1);
+            color: #4ade80;
+            border: 1px solid rgba(74, 222, 128, 0.3);
+        }
+        
+        .maintenance {
+            background-color: rgba(248, 113, 113, 0.1);
+            color: #f87171;
+            border: 1px solid rgba(248, 113, 113, 0.3);
+        }
+        
+        .checked-in {
+            background-color: rgba(74, 222, 128, 0.1);
+            color: #4ade80;
+            border: 1px solid rgba(74, 222, 128, 0.3);
+        }
+        
+        .not-checked-in {
+            background-color: rgba(248, 113, 113, 0.1);
+            color: #f87171;
+            border: 1px solid rgba(248, 113, 113, 0.3);
+        }
+        
+        .first-class {
+            background-color: rgba(192, 132, 252, 0.1);
+            color: #c084fc;
+            border: 1px solid rgba(192, 132, 252, 0.3);
+        }
+        
+        .business-class {
+            background-color: rgba(129, 140, 248, 0.1);
+            color: #818cf8;
+            border: 1px solid rgba(129, 140, 248, 0.3);
+        }
+        
+        .economy-class {
+            background-color: rgba(156, 163, 175, 0.1);
+            color: #9ca3af;
+            border: 1px solid rgba(156, 163, 175, 0.3);
+        }
+        
+        .pilot {
+            background-color: rgba(192, 132, 252, 0.1);
+            color: #c084fc;
+            border: 1px solid rgba(192, 132, 252, 0.3);
+        }
+        
+        .co-pilot {
+            background-color: rgba(129, 140, 248, 0.1);
+            color: #818cf8;
+            border: 1px solid rgba(129, 140, 248, 0.3);
+        }
+        
+        .flight-attendant {
+            background-color: rgba(96, 165, 250, 0.1);
+            color: #60a5fa;
+            border: 1px solid rgba(96, 165, 250, 0.3);
+        }
+        
+        .on-leave {
+            background-color: rgba(250, 204, 21, 0.1);
+            color: #facc15;
+            border: 1px solid rgba(250, 204, 21, 0.3);
+        }
+        
+        .progress-bar {
+            height: 0.5rem;
+            border-radius: 0.25rem;
+            background-color: rgba(30, 27, 75, 0.5);
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 0.25rem;
+        }
+        
+        .high-load {
+            background-color: #f87171;
+        }
+        
+        .medium-load {
+            background-color: #facc15;
+        }
+        
+        .low-load {
+            background-color: #4ade80;
+        }
+        
+        .table-header {
+            background-color: rgba(30, 27, 75, 0.7);
+            border-bottom: 1px solid rgba(167, 139, 250, 0.1);
+        }
+        
+        .table-row {
+            border-bottom: 1px solid rgba(167, 139, 250, 0.05);
+        }
+        
+        .table-row:hover {
+            background-color: rgba(30, 27, 75, 0.5);
+        }
+        
+        .action-btn {
+            transition: all 0.2s ease;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .modal-overlay {
+            background-color: rgba(15, 23, 42, 0.9);
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, rgba(30, 27, 75, 0.9) 0%, rgba(44, 29, 109, 0.9) 100%);
+            border: 1px solid rgba(167, 139, 250, 0.2);
+        }
+        
+        .input-field {
+            background-color: rgba(30, 27, 75, 0.5);
+            border: 1px solid rgba(167, 139, 250, 0.2);
+            transition: all 0.2s ease;
+        }
+        
+        .input-field:focus {
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.3);
+        }
+        
+        .select-field {
+            background-color: rgba(30, 27, 75, 0.5);
+            border: 1px solid rgba(167, 139, 250, 0.2);
+            transition: all 0.2s ease;
+        }
+        
+        .select-field:focus {
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.3);
+        }
+        
+        .btn-primary {
+            background-color: #6d28d9;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: #7c3aed;
+            box-shadow: 0 0 10px rgba(109, 40, 217, 0.5);
+        }
+        
+        .btn-secondary {
+            background-color: rgba(30, 27, 75, 0.5);
+            border: 1px solid rgba(167, 139, 250, 0.3);
+            transition: all 0.2s ease;
+        }
+        
+        .btn-secondary:hover {
+            background-color: rgba(30, 27, 75, 0.7);
+            border-color: rgba(167, 139, 250, 0.5);
+        }
+        
+        .flight-id {
+            font-family: 'Orbitron', sans-serif;
+            color: #a78bfa;
+            letter-spacing: 0.05em;
+        }
+        
+        .route-display {
+            font-weight: 500;
+            color: #e2e8f0;
+        }
+        
+        .time-display {
+            font-family: 'Orbitron', sans-serif;
+            color: #a78bfa;
+            letter-spacing: 0.05em;
+        }
+        
+        .duration-display {
+            color: #94a3b8;
+        }
+        
+        .aircraft-display {
+            font-weight: 500;
+            color: #e2e8f0;
+        }
+        
+        .gate-display {
+            font-family: 'Orbitron', sans-serif;
+            color: #a78bfa;
+            letter-spacing: 0.05em;
+        }
+    </style>
+</head>
+<body class="flex">
+    <!-- Sidebar -->
+    <div class="w-64 sidebar-glass h-screen fixed left-0 top-0 p-6 z-10">
+        <div class="flex items-center mb-10">
+            <div class="hexagon bg-quantum-accent w-10 h-10 flex items-center justify-center mr-3 pulse-animation">
+                <i class="fas fa-plane text-white"></i>
+            </div>
+            <h1 class="text-xl font-bold tech-font neon-text">QUANTUM AIRWAYS</h1>
+        </div>
+        <nav class="space-y-2">
+            <button data-section="dashboard" onclick="showSection('dashboard')" class="w-full text-left py-3 px-4 rounded-lg nav-item transition-colors flex items-center">
+                <i class="fas fa-chart-pie mr-3 text-quantum-accent"></i>Dashboard
+            </button>
+            <button data-section="flights" onclick="showSection('flights')" class="w-full text-left py-3 px-4 rounded-lg nav-item transition-colors flex items-center">
+                <i class="fas fa-plane-departure mr-3 text-quantum-accent"></i>Flights
+            </button>
+            <button data-section="aircrafts" onclick="showSection('aircrafts')" class="w-full text-left py-3 px-4 rounded-lg nav-item transition-colors flex items-center">
+                <i class="fas fa-plane mr-3 text-quantum-accent"></i>Aircrafts
+            </button>
+            <button data-section="crew" onclick="showSection('crew')" class="w-full text-left py-3 px-4 rounded-lg nav-item transition-colors flex items-center">
+                <i class="fas fa-users mr-3 text-quantum-accent"></i>Crew
+            </button>
+            <button data-section="passengers" onclick="showSection('passengers')" class="w-full text-left py-3 px-4 rounded-lg nav-item transition-colors flex items-center">
+                <i class="fas fa-user-tie mr-3 text-quantum-accent"></i>Passengers
+            </button>
+            <button data-section="new-flight" onclick="showSection('new-flight')" class="w-full text-left py-3 px-4 rounded-lg nav-item transition-colors flex items-center">
+                <i class="fas fa-plus-circle mr-3 text-quantum-accent"></i>New Flight
+            </button>
+            <button data-section="new-passenger" onclick="showSection('new-passenger')" class="w-full text-left py-3 px-4 rounded-lg nav-item transition-colors flex items-center">
+                <i class="fas fa-user-plus mr-3 text-quantum-accent"></i>New Passenger
+            </button>
+        </nav>
+        
+        <div class="absolute bottom-6 left-6 right-6">
+            <div class="glass-card p-4 rounded-lg neon-border-purple">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 rounded-full bg-quantum-primary flex items-center justify-center mr-3">
+                        <i class="fas fa-user-shield text-white"></i>
+                    </div>
+                    <div>
+                        <p class="font-medium">Flight Control</p>
+                        <p class="text-xs text-quantum-accent">Admin Access</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="ml-64 w-full p-8">
+        <!-- Dashboard -->
+        <div id="dashboard" class="space-y-8">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-3xl font-bold tech-font text-quantum-accent">FLIGHT CONTROL DASHBOARD</h2>
+                    <p class="text-quantum-accent">Welcome back, Administrator</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="text-sm text-quantum-accent">Last updated:</span>
+                    <span class="font-mono text-sm bg-quantum-dark px-3 py-1 rounded text-quantum-accent" id="current-time">${new Date().toLocaleTimeString()}</span>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Total Flights -->
+                <div class="glass-card dashboard-card p-6 rounded-xl neon-border transition-all">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-quantum-accent">Total Flights</p>
+                            <h3 class="text-3xl font-bold mt-1 text-white" id="total-flights">0</h3>
+                        </div>
+                        <div class="bg-quantum-primary text-quantum-accent p-3 rounded-lg">
+                            <i class="fas fa-plane-departure text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <p class="text-sm text-quantum-accent">Active: <span class="text-white" id="active-flights">0</span></p>
+                        <p class="text-sm text-quantum-accent">Delayed: <span class="text-yellow-300" id="delayed-flights">0</span></p>
+                    </div>
+                </div>
+
+                <!-- Aircrafts -->
+                <div class="glass-card dashboard-card p-6 rounded-xl neon-border transition-all">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-quantum-accent">Aircrafts</p>
+                            <h3 class="text-3xl font-bold mt-1 text-white" id="total-aircrafts">0</h3>
+                        </div>
+                        <div class="bg-quantum-primary text-quantum-accent p-3 rounded-lg">
+                            <i class="fas fa-plane text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <p class="text-sm text-quantum-accent">Active: <span class="text-green-300" id="active-aircrafts">0</span></p>
+                        <p class="text-sm text-quantum-accent">In Maintenance: <span class="text-red-300">${aircrafts.filter(a => a.status === 'Maintenance').length}</span></p>
+                    </div>
+                </div>
+
+                <!-- Crew -->
+                <div class="glass-card dashboard-card p-6 rounded-xl neon-border transition-all">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-quantum-accent">Crew Members</p>
+                            <h3 class="text-3xl font-bold mt-1 text-white" id="total-crew">0</h3>
+                        </div>
+                        <div class="bg-quantum-primary text-quantum-accent p-3 rounded-lg">
+                            <i class="fas fa-users text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <p class="text-sm text-quantum-accent">Active: <span class="text-green-300" id="active-crew">0</span></p>
+                        <p class="text-sm text-quantum-accent">On Leave: <span class="text-yellow-300">${crew.filter(c => c.status === 'On Leave').length}</span></p>
+                    </div>
+                </div>
+
+                <!-- Passengers -->
+                <div class="glass-card dashboard-card p-6 rounded-xl neon-border transition-all">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-quantum-accent">Passengers</p>
+                            <h3 class="text-3xl font-bold mt-1 text-white" id="total-passengers">0</h3>
+                        </div>
+                        <div class="bg-quantum-primary text-quantum-accent p-3 rounded-lg">
+                            <i class="fas fa-user-tie text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <p class="text-sm text-quantum-accent">Checked In: <span class="text-green-300" id="checked-in-passengers">0</span></p>
+                        <p class="text-sm text-quantum-accent">Pending: <span class="text-red-300">${passengers.filter(p => p.status === 'Not Checked In').length}</span></p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Flight Status Overview -->
+            <div class="glass-card p-6 rounded-xl neon-border">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-semibold tech-font text-quantum-accent">FLIGHT STATUS OVERVIEW</h3>
+                    <button onclick="showSection('flights')" class="text-quantum-accent hover:text-quantum-secondary text-sm flex items-center">
+                        View All Flights <i class="fas fa-chevron-right ml-1 text-xs"></i>
+                    </button>
+                </div>
+                
+                <div class="mb-6" id="flight-status-chart">
+                    <!-- Flight status chart will be inserted here -->
+                </div>
+                
+                <div class="overflow-x-auto scrollbar-hide">
+                    <table class="w-full">
+                        <thead class="table-header">
+                            <tr>
+                                <th class="pb-3 text-left text-quantum-accent">Flight #</th>
+                                <th class="pb-3 text-left text-quantum-accent">Route</th>
+                                <th class="pb-3 text-left text-quantum-accent">Departure</th>
+                                <th class="pb-3 text-left text-quantum-accent">Aircraft</th>
+                                <th class="pb-3 text-left text-quantum-accent">Status</th>
+                                <th class="pb-3 text-left text-quantum-accent">Load</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${flights.slice(0, 5).map(flight => {
+                                const departureTime = new Date(flight.departure);
+                                const loadFactor = Math.round((flight.booked / flight.seats) * 100);
+                                return `
+                                    <tr class="table-row">
+                                        <td class="p-4 flight-id">${flight.id}</td>
+                                        <td class="p-4 route-display">${flight.origin} → ${flight.destination}</td>
+                                        <td class="p-4 time-display">${departureTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</td>
+                                        <td class="p-4 aircraft-display">${flight.aircraft}</td>
+                                        <td class="p-4">
+                                            ${flight.status === 'On Time' ? 
+                                              '<span class="status-badge on-time"><i class="fas fa-check-circle"></i> On Time</span>' : 
+                                              flight.status === 'Delayed' ? 
+                                              '<span class="status-badge delayed"><i class="fas fa-clock"></i> Delayed</span>' : 
+                                              flight.status === 'Boarding' ? 
+                                              '<span class="status-badge boarding"><i class="fas fa-users"></i> Boarding</span>' : 
+                                              '<span class="status-badge scheduled"><i class="fas fa-calendar"></i> Scheduled</span>'}
+                                        </td>
+                                        <td class="p-4">
+                                            <div class="flex items-center">
+                                                <div class="progress-bar w-full mr-2">
+                                                    <div class="progress-fill ${loadFactor > 90 ? 'high-load' : loadFactor > 70 ? 'medium-load' : 'low-load'}" style="width: ${loadFactor}%"></div>
+                                                </div>
+                                                <span class="text-xs text-quantum-accent">${loadFactor}%</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="glass-card p-6 rounded-xl neon-border">
+                    <h3 class="text-xl font-semibold mb-4 tech-font text-quantum-accent">FLIGHT OPERATIONS</h3>
+                    <div class="space-y-4">
+                        <button onclick="showSection('new-flight')" class="w-full btn-primary text-white py-3 rounded-lg transition-colors flex items-center justify-center">
+                            <i class="fas fa-plane-departure mr-2"></i> Schedule New Flight
+                        </button>
+                        <button onclick="showSection('new-passenger')" class="w-full btn-primary text-white py-3 rounded-lg transition-colors flex items-center justify-center">
+                            <i class="fas fa-user-plus mr-2"></i> Add Passenger
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="glass-card p-6 rounded-xl neon-border">
+                    <h3 class="text-xl font-semibold mb-4 tech-font text-quantum-accent">AIRCRAFT STATUS</h3>
+                    <div class="space-y-3">
+                        ${aircrafts.slice(0, 3).map(aircraft => {
+                            const lastMaintenance = new Date(aircraft.lastMaintenance);
+                            const daysSinceMaintenance = Math.floor((new Date() - lastMaintenance) / (1000 * 60 * 60 * 24));
+                            return `
+                                <div class="flex justify-between items-center p-3 bg-quantum-dark rounded-lg hover:bg-quantum-primary hover:bg-opacity-10 transition-colors">
+                                    <div>
+                                        <p class="font-medium text-white">${aircraft.model}</p>
+                                        <p class="text-xs text-quantum-accent">${aircraft.type}</p>
+                                    </div>
+                                    <span class="${aircraft.status === 'Active' ? 'status-badge active' : 'status-badge maintenance'}">
+                                        ${daysSinceMaintenance}d
+                                    </span>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+                
+                <div class="glass-card p-6 rounded-xl neon-border">
+                    <h3 class="text-xl font-semibold mb-4 tech-font text-quantum-accent">RUNWAY ACTIVITY</h3>
+                    <div class="runway h-24 rounded-lg flex items-center justify-center">
+                        <div class="text-center">
+                            <i class="fas fa-plane text-2xl text-white mb-2"></i>
+                            <p class="text-xs font-mono text-white">ACTIVE RUNWAYS: 3/4</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Flights Section -->
+        <div id="flights" style="display:none;" class="space-y-8">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-3xl font-bold tech-font text-quantum-accent">FLIGHT MANAGEMENT</h2>
+                    <p class="text-quantum-accent">Manage all scheduled flights</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="showSection('new-flight')" class="btn-primary text-white px-6 py-2 rounded-lg transition-colors flex items-center">
+                        <i class="fas fa-plus mr-2"></i> New Flight
+                    </button>
+                </div>
+            </div>
+            
+            <div class="glass-card p-6 rounded-xl neon-border">
+                <div class="mb-6 flex justify-between items-center">
+                    <div class="flex space-x-4">
+                        <div>
+                            <label class="block text-sm text-quantum-accent mb-1">Filter by Status</label>
+                            <select id="flight-status-filter" class="select-field rounded-lg px-4 py-2 w-40">
+                                <option value="all">All Statuses</option>
+                                <option value="On Time">On Time</option>
+                                <option value="Delayed">Delayed</option>
+                                <option value="Boarding">Boarding</option>
+                                <option value="Scheduled">Scheduled</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-quantum-accent mb-1">Filter by Aircraft</label>
+                            <select id="flight-aircraft-filter" class="select-field rounded-lg px-4 py-2 w-48">
+                                <option value="all">All Aircrafts</option>
+                                ${[...new Set(flights.map(f => f.aircraft))].map(aircraft => `
+                                    <option value="${aircraft}">${aircraft}</option>
+                                `).join('')}
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-quantum-accent mb-1">Search</label>
+                        <div class="relative">
+                            <input type="text" placeholder="Search flights..." class="input-field rounded-lg pl-10 pr-4 py-2 w-64">
+                            <i class="fas fa-search absolute left-3 top-3 text-quantum-accent"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto scrollbar-hide">
+                    <table class="w-full">
+                        <thead class="table-header">
+                            <tr>
+                                <th class="pb-3 text-left text-quantum-accent">Flight #</th>
+                                <th class="pb-3 text-left text-quantum-accent">Route</th>
+                                <th class="pb-3 text-left text-quantum-accent">Departure</th>
+                                <th class="pb-3 text-left text-quantum-accent">Arrival</th>
+                                <th class="pb-3 text-left text-quantum-accent">Duration</th>
+                                <th class="pb-3 text-left text-quantum-accent">Aircraft</th>
+                                <th class="pb-3 text-left text-quantum-accent">Status</th>
+                                <th class="pb-3 text-left text-quantum-accent">Load</th>
+                                <th class="pb-3 text-left text-quantum-accent">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="flights-table-body">
+                            <!-- Flights will be dynamically populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Aircrafts Section -->
+        <div id="aircrafts" style="display:none;" class="space-y-8">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-3xl font-bold tech-font text-quantum-accent">AIRCRAFT FLEET</h2>
+                    <p class="text-quantum-accent">Manage all aircraft in the fleet</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="btn-primary text-white px-6 py-2 rounded-lg transition-colors flex items-center">
+                        <i class="fas fa-plus mr-2"></i> Add Aircraft
+                    </button>
+                </div>
+            </div>
+            
+            <div class="glass-card p-6 rounded-xl neon-border">
+                <div class="mb-6 flex justify-between items-center">
+                    <div class="flex space-x-4">
+                        <div>
+                            <label class="block text-sm text-quantum-accent mb-1">Filter by Status</label>
+                            <select id="aircraft-status-filter" class="select-field rounded-lg px-4 py-2 w-40">
+                                <option value="all">All Statuses</option>
+                                <option value="Active">Active</option>
+                                <option value="Maintenance">Maintenance</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-quantum-accent mb-1">Filter by Type</label>
+                            <select id="aircraft-type-filter" class="select-field rounded-lg px-4 py-2 w-48">
+                                <option value="all">All Types</option>
+                                <option value="Wide-body">Wide-body</option>
+                                <option value="Narrow-body">Narrow-body</option>
+                                <option value="Regional">Regional</option>
+                                <option value="Dreamliner">Dreamliner</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-quantum-accent mb-1">Search</label>
+                        <div class="relative">
+                            <input type="text" placeholder="Search aircraft..." class="input-field rounded-lg pl-10 pr-4 py-2 w-64">
+                            <i class="fas fa-search absolute left-3 top-3 text-quantum-accent"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto scrollbar-hide">
+                    <table class="w-full">
+                        <thead class="table-header">
+                            <tr>
+                                <th class="pb-3 text-left text-quantum-accent">Model</th>
+                                <th class="pb-3 text-left text-quantum-accent">Type</th>
+                                <th class="pb-3 text-left text-quantum-accent">Capacity</th>
+                                <th class="pb-3 text-left text-quantum-accent">Range</th>
+                                <th class="pb-3 text-left text-quantum-accent">Status</th>
+                                <th class="pb-3 text-left text-quantum-accent">Last Maintenance</th>
+                                <th class="pb-3 text-left text-quantum-accent">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="aircrafts-table-body">
+                            <!-- Aircrafts will be dynamically populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Crew Section -->
+        <div id="crew" style="display:none;" class="space-y-8">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-3xl font-bold tech-font text-quantum-accent">CREW MANAGEMENT</h2>
+                    <p class="text-quantum-accent">Manage all crew members</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="btn-primary text-white px-6 py-2 rounded-lg transition-colors flex items-center">
+                        <i class="fas fa-plus mr-2"></i> Add Crew
+                    </button>
+                </div>
+            </div>
+            
+            <div class="glass-card p-6 rounded-xl neon-border">
+                <div class="mb-6 flex justify-between items-center">
+                    <div class="flex space-x-4">
+                        <div>
+                            <label class="block text-sm text-quantum-accent mb-1">Filter by Role</label>
+                            <select id="crew-role-filter" class="select-field rounded-lg px-4 py-2 w-48">
+                                <option value="all">All Roles</option>
+                                <option value="Pilot">Pilot</option>
+                                <option value="Co-Pilot">Co-Pilot</option>
+                                <option value="Lead Flight Attendant">Lead Flight Attendant</option>
+                                <option value="Flight Attendant">Flight Attendant</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-quantum-accent mb-1">Filter by Status</label>
+                            <select id="crew-status-filter" class="select-field rounded-lg px-4 py-2 w-40">
+                                <option value="all">All Statuses</option>
+                                <option value="Active">Active</option>
+                                <option value="On Leave">On Leave</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-quantum-accent mb-1">Search</label>
+                        <div class="relative">
+                            <input type="text" placeholder="Search crew..." class="input-field rounded-lg pl-10 pr-4 py-2 w-64">
+                            <i class="fas fa-search absolute left-3 top-3 text-quantum-accent"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto scrollbar-hide">
+                    <table class="w-full">
+                        <thead class="table-header">
+                            <tr>
+                                <th class="pb-3 text-left text-quantum-accent">ID</th>
+                                <th class="pb-3 text-left text-quantum-accent">Name</th>
+                                <th class="pb-3 text-left text-quantum-accent">Role</th>
+                                <th class="pb-3 text-left text-quantum-accent">Flights Assigned</th>
+                                <th class="pb-3 text-left text-quantum-accent">Status</th>
+                                <th class="pb-3 text-left text-quantum-accent">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="crew-table-body">
+                            <!-- Crew will be dynamically populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Passengers Section -->
+        <div id="passengers" style="display:none;" class="space-y-8">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-3xl font-bold tech-font text-quantum-accent">PASSENGER MANAGEMENT</h2>
+                    <p class="text-quantum-accent">Manage all passengers</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="showSection('new-passenger')" class="btn-primary text-white px-6 py-2 rounded-lg transition-colors flex items-center">
+                        <i class="fas fa-plus mr-2"></i> Add Passenger
+                    </button>
+                </div>
+            </div>
+            
+            <div class="glass-card p-6 rounded-xl neon-border">
+                <div class="mb-6 flex justify-between items-center">
+                    <div class="flex space-x-4">
+                        <div>
+                            <label class="block text-sm text-quantum-accent mb-1">Filter by Flight</label>
+                            <select id="passenger-flight-filter" class="select-field rounded-lg px-4 py-2 w-48">
+                                <option value="all">All Flights</option>
+                                ${[...new Set(flights.map(f => f.id))].map(flight => `
+                                    <option value="${flight}">${flight}</option>
+                                `).join('')}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-quantum-accent mb-1">Filter by Class</label>
+                            <select id="passenger-class-filter" class="select-field rounded-lg px-4 py-2 w-40">
+                                <option value="all">All Classes</option>
+                                <option value="First">First</option>
+                                <option value="Business">Business</option>
+                                <option value="Economy">Economy</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-quantum-accent mb-1">Filter by Status</label>
+                            <select id="passenger-status-filter" class="select-field rounded-lg px-4 py-2 w-40">
+                                <option value="all">All Statuses</option>
+                                <option value="Checked In">Checked In</option>
+                                <option value="Not Checked In">Not Checked In</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-quantum-accent mb-1">Search</label>
+                        <div class="relative">
+                            <input type="text" placeholder="Search passengers..." class="input-field rounded-lg pl-10 pr-4 py-2 w-64">
+                            <i class="fas fa-search absolute left-3 top-3 text-quantum-accent"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto scrollbar-hide">
+                    <table class="w-full">
+                        <thead class="table-header">
+                            <tr>
+                                <th class="pb-3 text-left text-quantum-accent">ID</th>
+                                <th class="pb-3 text-left text-quantum-accent">Name</th>
+                                <th class="pb-3 text-left text-quantum-accent">Flight</th>
+                                <th class="pb-3 text-left text-quantum-accent">Route</th>
+                                <th class="pb-3 text-left text-quantum-accent">Seat</th>
+                                <th class="pb-3 text-left text-quantum-accent">Class</th>
+                                <th class="pb-3 text-left text-quantum-accent">Status</th>
+                                <th class="pb-3 text-left text-quantum-accent">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="passengers-table-body">
+                            <!-- Passengers will be dynamically populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- New Flight Section -->
+        <div id="new-flight" style="display:none;" class="space-y-8">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-3xl font-bold tech-font text-quantum-accent">SCHEDULE NEW FLIGHT</h2>
+                    <p class="text-quantum-accent">Add a new flight to the schedule</p>
+                </div>
+                <button onclick="showSection('flights')" class="text-quantum-accent hover:text-quantum-secondary flex items-center">
+                    <i class="fas fa-arrow-left mr-2"></i> Back to Flights
+                </button>
+            </div>
+            
+            <div class="glass-card p-8 rounded-xl neon-border">
+                <form class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-quantum-accent mb-2">Flight Number</label>
+                            <input 
+                                type="text" 
+                                class="w-full input-field rounded-lg px-4 py-3" 
+                                placeholder="QA123"
+                                required
+                            >
+                        </div>
+                        
+                        <div>
+                            <label class="block text-quantum-accent mb-2">Date</label>
+                            <input 
+                                type="date" 
+                                id="flight-date"
+                                class="w-full input-field rounded-lg px-4 py-3"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-quantum-accent mb-2">Origin</label>
+                            <select class="w-full select-field rounded-lg px-4 py-3" required>
+                                <option value="">Select Origin</option>
+                                <option value="JFK">JFK - New York</option>
+                                <option value="LAX">LAX - Los Angeles</option>
+                                <option value="ORD">ORD - Chicago</option>
+                                <option value="DFW">DFW - Dallas</option>
+                                <option value="ATL">ATL - Atlanta</option>
+                                <option value="SFO">SFO - San Francisco</option>
+                                <option value="SEA">SEA - Seattle</option>
+                                <option value="MIA">MIA - Miami</option>
+                                <option value="BOS">BOS - Boston</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-quantum-accent mb-2">Destination</label>
+                            <select class="w-full select-field rounded-lg px-4 py-3" required>
+                                <option value="">Select Destination</option>
+                                <option value="JFK">JFK - New York</option>
+                                <option value="LAX">LAX - Los Angeles</option>
+                                <option value="ORD">ORD - Chicago</option>
+                                <option value="DFW">DFW - Dallas</option>
+                                <option value="ATL">ATL - Atlanta</option>
+                                <option value="SFO">SFO - San Francisco</option>
+                                <option value="SEA">SEA - Seattle</option>
+                                <option value="MIA">MIA - Miami</option>
+                                <option value="BOS">BOS - Boston</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-quantum-accent mb-2">Departure Time</label>
+                            <input 
+                                type="time" 
+                                class="w-full input-field rounded-lg px-4 py-3"
+                                required
+                            >
+                        </div>
+                        
+                        <div>
+                            <label class="block text-quantum-accent mb-2">Arrival Time</label>
+                            <input 
+                                type="time" 
+                                class="w-full input-field rounded-lg px-4 py-3"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-quantum-accent mb-2">Aircraft</label>
+                            <select class="w-full select-field rounded-lg px-4 py-3" required>
+                                <option value="">Select Aircraft</option>
+                                ${aircrafts.filter(a => a.status === 'Active').map(aircraft => `
+                                    <option value="${aircraft.model}">${aircraft.model} (${aircraft.type})</option>
+                                `).join('')}
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-quantum-accent mb-2">Gate</label>
+                            <select class="w-full select-field rounded-lg px-4 py-3" required>
+                                <option value="">Select Gate</option>
+                                <option value="A1">A1</option>
+                                <option value="A2">A2</option>
+                                <option value="A3">A3</option>
+                                <option value="B1">B1</option>
+                                <option value="B2">B2</option>
+                                <option value="B3">B3</option>
+                                <option value="C1">C1</option>
+                                <option value="C2">C2</option>
+                                <option value="C3">C3</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="pt-4 flex justify-end space-x-3">
+                        <button 
+                            type="button" 
+                            onclick="showSection('flights')" 
+                            class="px-6 py-3 btn-secondary rounded-lg"
+                        >
+                            Cancel
+                        </button>
+                        <button 
+                            type="button" 
+                            class="px-6 py-3 btn-primary text-white rounded-lg flex items-center"
+                        >
+                            <i class="fas fa-plane-departure mr-2"></i> Schedule Flight
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- New Passenger Section -->
+        <div id="new-passenger" style="display:none;" class="space-y-8">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-3xl font-bold tech-font text-quantum-accent">ADD NEW PASSENGER</h2>
+                    <p class="text-quantum-accent">Add a new passenger to the system</p>
+                </div>
+                <button onclick="showSection('passengers')" class="text-quantum-accent hover:text-quantum-secondary flex items-center">
+                    <i class="fas fa-arrow-left mr-2"></i> Back to Passengers
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 glass-card p-8 rounded-xl neon-border">
+                    <form id="new-passenger-form" class="space-y-6">
+                        <div>
+                            <label class="block text-quantum-accent mb-2">Passenger Name</label>
+                            <input 
+                                type="text" 
+                                id="passenger-name"
+                                class="w-full input-field rounded-lg px-4 py-3" 
+                                placeholder="Enter passenger name"
+                                required
+                            >
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-quantum-accent mb-2">Flight</label>
+                                <select 
+                                    id="passenger-flight"
+                                    class="w-full select-field rounded-lg px-4 py-3" 
+                                    required
+                                >
+                                    <option value="">Select Flight</option>
+                                    ${flights.map(flight => `
+                                        <option value="${flight.id}">${flight.id}: ${flight.origin} → ${flight.destination}</option>
+                                    `).join('')}
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-quantum-accent mb-2">Seat</label>
+                                <input 
+                                    type="text" 
+                                    id="passenger-seat"
+                                    class="w-full input-field rounded-lg px-4 py-3" 
+                                    placeholder="12A"
+                                    required
+                                >
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-quantum-accent mb-2">Class</label>
+                            <select 
+                                id="passenger-class"
+                                class="w-full select-field rounded-lg px-4 py-3" 
+                                required
+                            >
+                                <option value="">Select Class</option>
+                                <option value="First">First Class</option>
+                                <option value="Business">Business Class</option>
+                                <option value="Economy">Economy Class</option>
+                            </select>
+                        </div>
+                        
+                        <div class="pt-4 flex justify-end space-x-3">
+                            <button 
+                                type="button" 
+                                onclick="showSection('passengers')" 
+                                class="px-6 py-3 btn-secondary rounded-lg"
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                type="button" 
+                                onclick="addNewPassenger()"
+                                class="px-6 py-3 btn-primary text-white rounded-lg flex items-center"
+                            >
+                                <i class="fas fa-user-plus mr-2"></i> Add Passenger
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="glass-card p-8 rounded-xl neon-border">
+                    <h3 class="text-xl font-semibold mb-6 tech-font text-quantum-accent">FLIGHT INFORMATION</h3>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <p class="text-quantum-accent mb-1">Selected Flight</p>
+                            <p class="text-lg font-medium text-white" id="selected-flight-info">None selected</p>
+                        </div>
+                        
+                        <div>
+                            <p class="text-quantum-accent mb-1">Available Seats</p>
+                            <p class="text-2xl font-bold text-green-400" id="available-seats">-</p>
+                        </div>
+                        
+                        <div>
+                            <p class="text-quantum-accent mb-1">Seat Map</p>
+                            <div class="bg-quantum-dark p-4 rounded-lg">
+                                <div class="grid grid-cols-4 gap-2">
+                                    ${['A', 'B', 'C', 'D'].map(letter => `
+                                        <div class="text-center">
+                                            <p class="text-xs text-quantum-accent mb-2">${letter}</p>
+                                            ${[1, 2, 3, 4, 5, 6].map(num => `
+                                                <div class="w-6 h-6 bg-quantum-primary bg-opacity-20 rounded-sm mb-1 mx-auto hover:bg-opacity-50 cursor-pointer transition-colors"></div>
+                                            `).join('')}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                                <p class="text-xs text-quantum-accent mt-2 text-center">First Class Section</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Flight data
+        const flights = [
+            {
+                id: 'QA101',
+                origin: 'JFK',
+                destination: 'LAX',
+                departure: '2023-12-15T08:00:00',
+                arrival: '2023-12-15T11:30:00',
+                aircraft: 'Boeing 787',
+                seats: 250,
+                booked: 187,
+                status: 'On Time',
+                gate: 'A12'
+            },
+            {
+                id: 'QA202',
+                origin: 'LAX',
+                destination: 'ORD',
+                departure: '2023-12-15T09:30:00',
+                arrival: '2023-12-15T15:45:00',
+                aircraft: 'Airbus A320',
+                seats: 180,
+                booked: 153,
+                status: 'Delayed',
+                gate: 'B7'
+            },
+            {
+                id: 'QA303',
+                origin: 'ORD',
+                destination: 'DFW',
+                departure: '2023-12-15T11:15:00',
+                arrival: '2023-12-15T13:30:00',
+                aircraft: 'Boeing 737',
+                seats: 190,
+                booked: 120,
+                status: 'On Time',
+                gate: 'C3'
+            },
+            {
+                id: 'QA404',
+                origin: 'DFW',
+                destination: 'ATL',
+                departure: '2023-12-15T14:00:00',
+                arrival: '2023-12-15T16:15:00',
+                aircraft: 'Airbus A321',
+                seats: 220,
+                booked: 220,
+                status: 'Boarding',
+                gate: 'D9'
+            },
+            {
+                id: 'QA505',
+                origin: 'ATL',
+                destination: 'JFK',
+                departure: '2023-12-15T17:30:00',
+                arrival: '2023-12-15T19:45:00',
+                aircraft: 'Boeing 777',
+                seats: 300,
+                booked: 210,
+                status: 'Scheduled',
+                gate: 'E5'
+            },
+            {
+                id: 'QA606',
+                origin: 'SFO',
+                destination: 'SEA',
+                departure: '2023-12-15T10:45:00',
+                arrival: '2023-12-15T12:15:00',
+                aircraft: 'Embraer E175',
+                seats: 90,
+                booked: 65,
+                status: 'On Time',
+                gate: 'F2'
+            },
+            {
+                id: 'QA707',
+                origin: 'MIA',
+                destination: 'BOS',
+                departure: '2023-12-15T13:20:00',
+                arrival: '2023-12-15T16:10:00',
+                aircraft: 'Airbus A330',
+                seats: 280,
+                booked: 245,
+                status: 'Boarding',
+                gate: 'G8'
+            }
+        ];
+
+        // Aircraft data
+        const aircrafts = [
+            {
+                model: 'Boeing 787',
+                type: 'Dreamliner',
+                capacity: 250,
+                range: '7,530 nmi',
+                status: 'Active',
+                lastMaintenance: '2023-11-20'
+            },
+            {
+                model: 'Airbus A320',
+                type: 'Narrow-body',
+                capacity: 180,
+                range: '3,300 nmi',
+                status: 'Active',
+                lastMaintenance: '2023-12-01'
+            },
+            {
+                model: 'Boeing 737',
+                type: 'Narrow-body',
+                capacity: 190,
+                range: '3,000 nmi',
+                status: 'Active',
+                lastMaintenance: '2023-11-15'
+            },
+            {
+                model: 'Airbus A321',
+                type: 'Narrow-body',
+                capacity: 220,
+                range: '3,200 nmi',
+                status: 'Active',
+                lastMaintenance: '2023-12-05'
+            },
+            {
+                model: 'Boeing 777',
+                type: 'Wide-body',
+                capacity: 300,
+                range: '8,555 nmi',
+                status: 'Active',
+                lastMaintenance: '2023-11-10'
+            },
+            {
+                model: 'Embraer E175',
+                type: 'Regional',
+                capacity: 90,
+                range: '2,000 nmi',
+                status: 'Active',
+                lastMaintenance: '2023-12-10'
+            },
+            {
+                model: 'Airbus A330',
+                type: 'Wide-body',
+                capacity: 280,
+                range: '7,250 nmi',
+                status: 'Maintenance',
+                lastMaintenance: '2023-12-12'
+            }
+        ];
+
+        // Crew data
+        const crew = [
+            {
+                id: 'CP001',
+                name: 'Capt. Sarah Johnson',
+                role: 'Pilot',
+                flightsAssigned: ['QA101', 'QA505'],
+                status: 'Active'
+            },
+            {
+                id: 'FO002',
+                name: 'First Officer Mark Williams',
+                role: 'Co-Pilot',
+                flightsAssigned: ['QA101', 'QA505'],
+                status: 'Active'
+            },
+            {
+                id: 'FA101',
+                name: 'Emily Chen',
+                role: 'Lead Flight Attendant',
+                flightsAssigned: ['QA101', 'QA202'],
+                status: 'Active'
+            },
+            {
+                id: 'FA102',
+                name: 'David Rodriguez',
+                role: 'Flight Attendant',
+                flightsAssigned: ['QA101', 'QA303'],
+                status: 'Active'
+            },
+            {
+                id: 'CP003',
+                name: 'Capt. Michael Brown',
+                role: 'Pilot',
+                flightsAssigned: ['QA202', 'QA404'],
+                status: 'Active'
+            },
+            {
+                id: 'FO004',
+                name: 'First Officer Jessica Lee',
+                role: 'Co-Pilot',
+                flightsAssigned: ['QA202', 'QA404'],
+                status: 'On Leave'
+            },
+            {
+                id: 'FA103',
+                name: 'Olivia Martinez',
+                role: 'Flight Attendant',
+                flightsAssigned: ['QA202', 'QA505'],
+                status: 'Active'
+            }
+        ];
+
+        // Passengers data
+        let passengers = [
+            {
+                id: 'PAX1001',
+                name: 'John Smith',
+                flight: 'QA101',
+                seat: '12A',
+                class: 'Business',
+                status: 'Checked In'
+            },
+            {
+                id: 'PAX1002',
+                name: 'Emma Wilson',
+                flight: 'QA101',
+                seat: '15C',
+                class: 'Economy',
+                status: 'Checked In'
+            },
+            {
+                id: 'PAX1003',
+                name: 'Robert Johnson',
+                flight: 'QA202',
+                seat: '8B',
+                class: 'First',
+                status: 'Checked In'
+            },
+            {
+                id: 'PAX1004',
+                name: 'Sophia Garcia',
+                flight: 'QA202',
+                seat: '22F',
+                class: 'Economy',
+                status: 'Not Checked In'
+            },
+            {
+                id: 'PAX1005',
+                name: 'Daniel Martinez',
+                flight: 'QA303',
+                seat: '3A',
+                class: 'Business',
+                status: 'Checked In'
+            },
+            {
+                id: 'PAX1006',
+                name: 'Ava Anderson',
+                flight: 'QA404',
+                seat: '18D',
+                class: 'Economy',
+                status: 'Checked In'
+            },
+            {
+                id: 'PAX1007',
+                name: 'James Taylor',
+                flight: 'QA505',
+                seat: '1A',
+                class: 'First',
+                status: 'Checked In'
+            }
+        ];
+
+        // Initialize the page
+        function initializePage() {
+            populateFlightsTable();
+            populateAircraftsTable();
+            populateCrewTable();
+            populatePassengersTable();
+            updateDashboardStats();
+            showSection('dashboard');
+            
+            // Set the minimum flight date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('flight-date').min = today;
+            
+            // Update time every second
+            setInterval(() => {
+                document.getElementById('current-time').textContent = new Date().toLocaleTimeString();
+            }, 1000);
+        }
+
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = ['dashboard', 'flights', 'aircrafts', 'crew', 'passengers', 'new-flight', 'new-passenger'];
+            sections.forEach(section => {
+                document.getElementById(section).style.display = 'none';
+            });
+
+            // Show selected section
+            document.getElementById(sectionId).style.display = 'block';
+
+            // Update active nav item
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('bg-quantum-primary', 'text-white', 'neon-border');
+                item.classList.add('hover:bg-quantum-dark');
+            });
+            document.querySelector(`.nav-item[data-section="${sectionId}"]`).classList.add('bg-quantum-primary', 'text-white', 'neon-border');
+            document.querySelector(`.nav-item[data-section="${sectionId}"]`).classList.remove('hover:bg-quantum-dark');
+        }
+
+        function populateFlightsTable() {
+            const flightsTableBody = document.getElementById('flights-table-body');
+            flightsTableBody.innerHTML = '';
+
+            flights.forEach(flight => {
+                const departureTime = new Date(flight.departure);
+                const arrivalTime = new Date(flight.arrival);
+                const duration = (arrivalTime - departureTime) / (1000 * 60 * 60);
+                const loadFactor = Math.round((flight.booked / flight.seats) * 100);
+                
+                const row = document.createElement('tr');
+                row.className = 'table-row';
+                row.innerHTML = `
+                    <td class="p-4 flight-id">${flight.id}</td>
+                    <td class="p-4">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 rounded-full bg-quantum-accent flex items-center justify-center mr-3">
+                                <i class="fas fa-plane-departure text-white text-sm"></i>
+                            </div>
+                            <span class="route-display">${flight.origin} → ${flight.destination}</span>
+                        </div>
+                    </td>
+                    <td class="p-4 time-display">${departureTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</td>
+                    <td class="p-4 time-display">${arrivalTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</td>
+                    <td class="p-4 duration-display">${duration.toFixed(1)} hrs</td>
+                    <td class="p-4 aircraft-display">${flight.aircraft}</td>
+                    <td class="p-4">
+                        ${flight.status === 'On Time' ? 
+                          '<span class="status-badge on-time"><i class="fas fa-check-circle"></i> On Time</span>' : 
+                          flight.status === 'Delayed' ? 
+                          '<span class="status-badge delayed"><i class="fas fa-clock"></i> Delayed</span>' : 
+                          flight.status === 'Boarding' ? 
+                          '<span class="status-badge boarding"><i class="fas fa-users"></i> Boarding</span>' : 
+                          '<span class="status-badge scheduled"><i class="fas fa-calendar"></i> Scheduled</span>'}
+                    </td>
+                    <td class="p-4">
+                        <div class="flex items-center">
+                            <div class="progress-bar w-full mr-2">
+                                <div class="progress-fill ${loadFactor > 90 ? 'high-load' : loadFactor > 70 ? 'medium-load' : 'low-load'}" style="width: ${loadFactor}%"></div>
+                            </div>
+                            <span class="text-xs text-quantum-accent">${loadFactor}%</span>
+                        </div>
+                    </td>
+                    <td class="p-4">
+                        <button onclick="viewFlightDetails('${flight.id}')" class="action-btn bg-quantum-primary hover:bg-quantum-secondary text-white px-3 py-1 rounded text-sm transition-colors">
+                            Details
+                        </button>
+                    </td>
+                `;
+                flightsTableBody.appendChild(row);
+            });
+        }
+
+        function populateAircraftsTable() {
+            const aircraftsTableBody = document.getElementById('aircrafts-table-body');
+            aircraftsTableBody.innerHTML = '';
+
+            aircrafts.forEach(aircraft => {
+                const lastMaintenance = new Date(aircraft.lastMaintenance);
+                const daysSinceMaintenance = Math.floor((new Date() - lastMaintenance) / (1000 * 60 * 60 * 24));
+                
+                const row = document.createElement('tr');
+                row.className = 'table-row';
+                row.innerHTML = `
+                    <td class="p-4 font-medium text-white">${aircraft.model}</td>
+                    <td class="p-4 text-quantum-accent">${aircraft.type}</td>
+                    <td class="p-4 font-mono text-quantum-accent">${aircraft.capacity}</td>
+                    <td class="p-4 text-quantum-accent">${aircraft.range}</td>
+                    <td class="p-4">
+                        ${aircraft.status === 'Active' ? 
+                          '<span class="status-badge active"><i class="fas fa-check-circle"></i> Active</span>' : 
+                          '<span class="status-badge maintenance"><i class="fas fa-tools"></i> Maintenance</span>'}
+                    </td>
+                    <td class="p-4 text-quantum-accent">${daysSinceMaintenance} days ago</td>
+                    <td class="p-4">
+                        <button onclick="viewAircraftDetails('${aircraft.model}')" class="action-btn bg-quantum-primary hover:bg-quantum-secondary text-white px-3 py-1 rounded text-sm transition-colors">
+                            Details
+                        </button>
+                    </td>
+                `;
+                aircraftsTableBody.appendChild(row);
+            });
+        }
+
+        function populateCrewTable() {
+            const crewTableBody = document.getElementById('crew-table-body');
+            crewTableBody.innerHTML = '';
+
+            crew.forEach(member => {
+                const row = document.createElement('tr');
+                row.className = 'table-row';
+                row.innerHTML = `
+                    <td class="p-4 font-mono text-quantum-accent">${member.id}</td>
+                    <td class="p-4 font-medium text-white">${member.name}</td>
+                    <td class="p-4">
+                        ${member.role === 'Pilot' ? 
+                          '<span class="status-badge pilot"><i class="fas fa-user-shield"></i> Pilot</span>' : 
+                          member.role === 'Co-Pilot' ? 
+                          '<span class="status-badge co-pilot"><i class="fas fa-user-astronaut"></i> Co-Pilot</span>' : 
+                          '<span class="status-badge flight-attendant"><i class="fas fa-user-tie"></i> Flight Attendant</span>'}
+                    </td>
+                    <td class="p-4">
+                        <div class="flex flex-wrap gap-1">
+                            ${member.flightsAssigned.map(flight => `
+                                <span class="bg-quantum-dark text-xs px-2 py-1 rounded text-quantum-accent">${flight}</span>
+                            `).join('')}
+                        </div>
+                    </td>
+                    <td class="p-4">
+                        ${member.status === 'Active' ? 
+                          '<span class="status-badge active"><i class="fas fa-check-circle"></i> Active</span>' : 
+                          '<span class="status-badge on-leave"><i class="fas fa-umbrella-beach"></i> On Leave</span>'}
+                    </td>
+                    <td class="p-4">
+                        <button onclick="viewCrewDetails('${member.id}')" class="action-btn bg-quantum-primary hover:bg-quantum-secondary text-white px-3 py-1 rounded text-sm transition-colors">
+                            Details
+                        </button>
+                    </td>
+                `;
+                crewTableBody.appendChild(row);
+            });
+        }
+
+        function populatePassengersTable() {
+            const passengersTableBody = document.getElementById('passengers-table-body');
+            passengersTableBody.innerHTML = '';
+
+            passengers.forEach(passenger => {
+                const flight = flights.find(f => f.id === passenger.flight);
+                const row = document.createElement('tr');
+                row.className = 'table-row';
+                row.innerHTML = `
+                    <td class="p-4 font-mono text-quantum-accent">${passenger.id}</td>
+                    <td class="p-4 font-medium text-white">${passenger.name}</td>
+                    <td class="p-4 font-mono text-quantum-accent">${passenger.flight}</td>
+                    <td class="p-4 text-quantum-accent">${flight ? `${flight.origin} → ${flight.destination}` : 'N/A'}</td>
+                    <td class="p-4 font-mono text-quantum-accent">${passenger.seat}</td>
+                    <td class="p-4">
+                        ${passenger.class === 'First' ? 
+                          '<span class="status-badge first-class"><i class="fas fa-crown"></i> First</span>' : 
+                          passenger.class === 'Business' ? 
+                          '<span class="status-badge business-class"><i class="fas fa-briefcase"></i> Business</span>' : 
+                          '<span class="status-badge economy-class"><i class="fas fa-chair"></i> Economy</span>'}
+                    </td>
+                    <td class="p-4">
+                        ${passenger.status === 'Checked In' ? 
+                          '<span class="status-badge checked-in"><i class="fas fa-check-circle"></i> Checked In</span>' : 
+                          '<span class="status-badge not-checked-in"><i class="fas fa-times-circle"></i> Not Checked In</span>'}
+                    </td>
+                    <td class="p-4">
+                        <button onclick="viewPassengerDetails('${passenger.id}')" class="action-btn bg-quantum-primary hover:bg-quantum-secondary text-white px-3 py-1 rounded text-sm transition-colors">
+                            Details
+                        </button>
+                    </td>
+                `;
+                passengersTableBody.appendChild(row);
+            });
+        }
+
+        function updateDashboardStats() {
+            // Flight stats
+            document.getElementById('total-flights').textContent = flights.length;
+            document.getElementById('active-flights').textContent = flights.filter(f => 
+                f.status === 'On Time' || f.status === 'Boarding' || f.status === 'Delayed').length;
+            document.getElementById('delayed-flights').textContent = flights.filter(f => f.status === 'Delayed').length;
+            
+            // Aircraft stats
+            document.getElementById('total-aircrafts').textContent = aircrafts.length;
+            document.getElementById('active-aircrafts').textContent = aircrafts.filter(a => a.status === 'Active').length;
+            
+            // Crew stats
+            document.getElementById('total-crew').textContent = crew.length;
+            document.getElementById('active-crew').textContent = crew.filter(c => c.status === 'Active').length;
+            
+            // Passenger stats
+            document.getElementById('total-passengers').textContent = passengers.length;
+            document.getElementById('checked-in-passengers').textContent = passengers.filter(p => p.status === 'Checked In').length;
+            
+            // Update flight status chart
+            updateFlightStatusChart();
+        }
+        
+        function updateFlightStatusChart() {
+            const statusCounts = {
+                'On Time': flights.filter(f => f.status === 'On Time').length,
+                'Delayed': flights.filter(f => f.status === 'Delayed').length,
+                'Boarding': flights.filter(f => f.status === 'Boarding').length,
+                'Scheduled': flights.filter(f => f.status === 'Scheduled').length
+            };
+            
+            const chart = document.getElementById('flight-status-chart');
+            chart.innerHTML = `
+                <div class="flex h-4 rounded-full overflow-hidden">
+                    <div class="bg-green-500" style="width: ${(statusCounts['On Time']/flights.length)*100}%"></div>
+                    <div class="bg-yellow-500" style="width: ${(statusCounts['Delayed']/flights.length)*100}%"></div>
+                    <div class="bg-blue-500" style="width: ${(statusCounts['Boarding']/flights.length)*100}%"></div>
+                    <div class="bg-gray-500" style="width: ${(statusCounts['Scheduled']/flights.length)*100}%"></div>
+                </div>
+                <div class="flex justify-between text-xs mt-2">
+                    <span class="text-green-400">${statusCounts['On Time']} On Time</span>
+                    <span class="text-yellow-400">${statusCounts['Delayed']} Delayed</span>
+                    <span class="text-blue-400">${statusCounts['Boarding']} Boarding</span>
+                    <span class="text-gray-400">${statusCounts['Scheduled']} Scheduled</span>
+                </div>
+            `;
+        }
+
+        function viewFlightDetails(flightId) {
+            const flight = flights.find(f => f.id === flightId);
+            if (!flight) return;
+            
+            const departureTime = new Date(flight.departure);
+            const arrivalTime = new Date(flight.arrival);
+            const duration = (arrivalTime - departureTime) / (1000 * 60 * 60);
+            const loadFactor = Math.round((flight.booked / flight.seats) * 100);
+            
+            // Show modal with flight details
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 modal-overlay flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="modal-content p-8 rounded-xl w-full max-w-2xl neon-border-purple">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-2xl font-bold tech-font text-quantum-accent">FLIGHT ${flight.id}</h3>
+                        <button onclick="this.parentElement.parentElement.parentElement.remove()" class="text-quantum-accent hover:text-white">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="text-lg font-semibold mb-3 text-quantum-accent">Route Information</h4>
+                            <div class="space-y-2">
+                                <p><span class="text-quantum-accent">Route:</span> <span class="text-white">${flight.origin} → ${flight.destination}</span></p>
+                                <p><span class="text-quantum-accent">Departure:</span> <span class="text-white">${departureTime.toLocaleString()}</span></p>
+                                <p><span class="text-quantum-accent">Arrival:</span> <span class="text-white">${arrivalTime.toLocaleString()}</span></p>
+                                <p><span class="text-quantum-accent">Duration:</span> <span class="text-white">${duration.toFixed(1)} hours</span></p>
+                                <p><span class="text-quantum-accent">Gate:</span> <span class="text-white">${flight.gate}</span></p>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="text-lg font-semibold mb-3 text-quantum-accent">Aircraft Information</h4>
+                            <div class="space-y-2">
+                                <p><span class="text-quantum-accent">Aircraft:</span> <span class="text-white">${flight.aircraft}</span></p>
+                                <p><span class="text-quantum-accent">Capacity:</span> <span class="text-white">${flight.seats} seats</span></p>
+                                <p><span class="text-quantum-accent">Booked:</span> <span class="text-white">${flight.booked} passengers</span></p>
+                                <p><span class="text-quantum-accent">Load Factor:</span> <span class="text-white">${loadFactor}%</span></p>
+                                <p>
+                                    <span class="text-quantum-accent">Status:</span> 
+                                    ${flight.status === 'On Time' ? 
+                                      '<span class="status-badge on-time"><i class="fas fa-check-circle"></i> On Time</span>' : 
+                                      flight.status === 'Delayed' ? 
+                                      '<span class="status-badge delayed"><i class="fas fa-clock"></i> Delayed</span>' : 
+                                      flight.status === 'Boarding' ? 
+                                      '<span class="status-badge boarding"><i class="fas fa-users"></i> Boarding</span>' : 
+                                      '<span class="status-badge scheduled"><i class="fas fa-calendar"></i> Scheduled</span>'}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6">
+                        <h4 class="text-lg font-semibold mb-3 text-quantum-accent">Assigned Crew</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            ${crew.filter(member => member.flightsAssigned.includes(flight.id)).map(member => `
+                                <div class="bg-quantum-dark p-3 rounded-lg hover:bg-quantum-primary hover:bg-opacity-10 transition-colors">
+                                    <p class="font-medium text-white">${member.name}</p>
+                                    <p class="text-sm text-quantum-accent">${member.role} • ${member.id}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 flex justify-end space-x-3">
+                        <button onclick="this.parentElement.parentElement.remove()" class="px-4 py-2 btn-secondary rounded-lg">
+                            Close
+                        </button>
+                        <button class="px-4 py-2 btn-primary text-white rounded-lg">
+                            Manage Flight
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function viewAircraftDetails(model) {
+            const aircraft = aircrafts.find(a => a.model === model);
+            if (!aircraft) return;
+            
+                        const lastMaintenance = new Date(aircraft.lastMaintenance);
+                        const daysSinceMaintenance = Math.floor((new Date() - lastMaintenance) / (1000 * 60 * 60 * 24));
+            
+                        // Show modal with aircraft details
+                        const modal = document.createElement('div');
+                        modal.className = 'fixed inset-0 modal-overlay flex items-center justify-center z-50';
+                        modal.innerHTML = `
+                            <div class="modal-content p-8 rounded-xl w-full max-w-2xl neon-border-purple">
+                                <div class="flex justify-between items-center mb-6">
+                                    <h3 class="text-2xl font-bold tech-font text-quantum-accent">${aircraft.model}</h3>
+                                    <button onclick="this.parentElement.parentElement.parentElement.remove()" class="text-quantum-accent hover:text-white">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <h4 class="text-lg font-semibold mb-3 text-quantum-accent">Specifications</h4>
+                                        <div class="space-y-2">
+                                            <p><span class="text-quantum-accent">Type:</span> <span class="text-white">${aircraft.type}</span></p>
+                                            <p><span class="text-quantum-accent">Capacity:</span> <span class="text-white">${aircraft.capacity} passengers</span></p>
+                                            <p><span class="text-quantum-accent">Range:</span> <span class="text-white">${aircraft.range}</span></p>
+                                            <p>
+                                                <span class="text-quantum-accent">Status:</span> 
+                                                ${aircraft.status === 'Active' ? 
+                                                '<span class="status-badge active"><i class="fas fa-check-circle"></i> Active</span>' : 
+                                                '<span class="status-badge maintenance"><i class="fas fa-tools"></i> Maintenance</span>'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                <div>
+                                    <h4 class="text-lg font-semibold mb-3 text-quantum-accent">Maintenance</h4>
+                                        <div class="space-y-2">
+                                            <p><span class="text-quantum-accent">Last Maintenance:</span> <span class="text-white">${lastMaintenance.toDateString()}</span></p>
+                                            <p><span class="text-quantum-accent">Days Since Maintenance:</span> <span class="text-white">${daysSinceMaintenance} days</span></p>
+                                            <div class="pt-2">
+                                                <p class="text-quantum-accent mb-1">Maintenance Status:</p>
+                                                <div class="progress-bar w-full">
+                                                    <div class="progress-fill ${daysSinceMaintenance > 60 ? 'high-load' : daysSinceMaintenance > 30 ? 'medium-load' : 'low-load'}" 
+                                                        style="width: ${Math.min(daysSinceMaintenance * 1.5, 100)}%"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                    
+                                <div class="mt-6">
+                                    <h4 class="text-lg font-semibold mb-3 text-quantum-accent">Scheduled Flights</h4>
+                                    <div class="space-y-2">
+                                        ${flights.filter(f => f.aircraft === aircraft.model).length > 0 ? 
+                                        flights.filter(f => f.aircraft === aircraft.model).map(flight => `
+                                            <div class="bg-quantum-dark p-3 rounded-lg hover:bg-quantum-primary hover:bg-opacity-10 transition-colors">
+                                                <p class="font-medium text-white">${flight.id}: ${flight.origin} → ${flight.destination}</p>
+                                                <p class="text-sm text-quantum-accent">${new Date(flight.departure).toLocaleString()}</p>
+                                            </div>
+                                        `).join('') : 
+                                        '<p class="text-quantum-accent">No flights scheduled for this aircraft</p>'}
+                                    </div>
+                                </div>
+                    
+                                <div class="mt-6 flex justify-end space-x-3">
+                                    <button onclick="this.parentElement.parentElement.remove()" class="px-4 py-2 btn-secondary rounded-lg">
+                                        Close
+                                    </button>
+                                    <button class="px-4 py-2 btn-primary text-white rounded-lg">
+                                        Manage Aircraft
+                                    </button>
+                                </div>
+                            </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function viewCrewDetails(crewId) {
+            const member = crew.find(c => c.id === crewId);
+            if (!member) return;
+            
+            // Show modal with crew details
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 modal-overlay flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="modal-content p-8 rounded-xl w-full max-w-2xl neon-border-purple">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-2xl font-bold tech-font text-quantum-accent">${member.name}</h3>
+                        <button onclick="this.parentElement.parentElement.parentElement.remove()" class="text-quantum-accent hover:text-white">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="text-lg font-semibold mb-3 text-quantum-accent">Crew Information</h4>
+                            <div class="space-y-2">
+                                <p><span class="text-quantum-accent">ID:</span> <span class="text-white">${member.id}</span></p>
+                                <p><span class="text-quantum-accent">Role:</span> 
+                                    ${member.role === 'Pilot' ? 
+                                      '<span class="status-badge pilot"><i class="fas fa-user-shield"></i> Pilot</span>' : 
+                                      member.role === 'Co-Pilot' ? 
+                                      '<span class="status-badge co-pilot"><i class="fas fa-user-astronaut"></i> Co-Pilot</span>' : 
+                                      '<span class="status-badge flight-attendant"><i class="fas fa-user-tie"></i> Flight Attendant</span>'}
+                                </p>
+                                <p>
+                                    <span class="text-quantum-accent">Status:</span> 
+                                    ${member.status === 'Active' ? 
+                                      '<span class="status-badge active"><i class="fas fa-check-circle"></i> Active</span>' : 
+                                      '<span class="status-badge on-leave"><i class="fas fa-umbrella-beach"></i> On Leave</span>'}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="text-lg font-semibold mb-3 text-quantum-accent">Assigned Flights</h4>
+                            <div class="space-y-2">
+                                ${member.flightsAssigned.length > 0 ? 
+                                  member.flightsAssigned.map(flightId => {
+                                    const flight = flights.find(f => f.id === flightId);
+                                    return flight ? `
+                                        <div class="bg-quantum-dark p-3 rounded-lg hover:bg-quantum-primary hover:bg-opacity-10 transition-colors">
+                                            <p class="font-medium text-white">${flight.id}: ${flight.origin} → ${flight.destination}</p>
+                                            <p class="text-sm text-quantum-accent">${new Date(flight.departure).toLocaleString()}</p>
+                                        </div>
+                                    ` : '';
+                                  }).join('') : 
+                                  '<p class="text-quantum-accent">No flights assigned</p>'}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 flex justify-end space-x-3">
+                        <button onclick="this.parentElement.parentElement.remove()" class="px-4 py-2 btn-secondary rounded-lg">
+                            Close
+                        </button>
+                        <button class="px-4 py-2 btn-primary text-white rounded-lg">
+                            Manage Crew
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function viewPassengerDetails(passengerId) {
+            const passenger = passengers.find(p => p.id === passengerId);
+            if (!passenger) return;
+            
+            const flight = flights.find(f => f.id === passenger.flight);
+            
+            // Show modal with passenger details
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 modal-overlay flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="modal-content p-8 rounded-xl w-full max-w-2xl neon-border-purple">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-2xl font-bold tech-font text-quantum-accent">${passenger.name}</h3>
+                        <button onclick="this.parentElement.parentElement.parentElement.remove()" class="text-quantum-accent hover:text-white">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="text-lg font-semibold mb-3 text-quantum-accent">Passenger Information</h4>
+                            <div class="space-y-2">
+                                <p><span class="text-quantum-accent">ID:</span> <span class="text-white">${passenger.id}</span></p>
+                                <p><span class="text-quantum-accent">Flight:</span> <span class="text-white">${passenger.flight}</span></p>
+                                <p><span class="text-quantum-accent">Seat:</span> <span class="text-white">${passenger.seat}</span></p>
+                                <p>
+                                    <span class="text-quantum-accent">Class:</span> 
+                                    ${passenger.class === 'First' ? 
+                                      '<span class="status-badge first-class"><i class="fas fa-crown"></i> First</span>' : 
+                                      passenger.class === 'Business' ? 
+                                      '<span class="status-badge business-class"><i class="fas fa-briefcase"></i> Business</span>' : 
+                                      '<span class="status-badge economy-class"><i class="fas fa-chair"></i> Economy</span>'}
+                                </p>
+                                <p>
+                                    <span class="text-quantum-accent">Status:</span> 
+                                    ${passenger.status === 'Checked In' ? 
+                                      '<span class="status-badge checked-in"><i class="fas fa-check-circle"></i> Checked In</span>' : 
+                                      '<span class="status-badge not-checked-in"><i class="fas fa-times-circle"></i> Not Checked In</span>'}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="text-lg font-semibold mb-3 text-quantum-accent">Flight Information</h4>
+                            <div class="space-y-2">
+                                ${flight ? `
+                                    <p><span class="text-quantum-accent">Route:</span> <span class="text-white">${flight.origin} → ${flight.destination}</span></p>
+                                    <p><span class="text-quantum-accent">Departure:</span> <span class="text-white">${new Date(flight.departure).toLocaleString()}</span></p>
+                                    <p><span class="text-quantum-accent">Arrival:</span> <span class="text-white">${new Date(flight.arrival).toLocaleString()}</span></p>
+                                    <p><span class="text-quantum-accent">Aircraft:</span> <span class="text-white">${flight.aircraft}</span></p>
+                                    <p><span class="text-quantum-accent">Gate:</span> <span class="text-white">${flight.gate}</span></p>
+                                ` : '<p class="text-quantum-accent">No flight information available</p>'}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 flex justify-end space-x-3">
+                        <button onclick="this.parentElement.parentElement.remove()" class="px-4 py-2 btn-secondary rounded-lg">
+                            Close
+                        </button>
+                        <button class="px-4 py-2 btn-primary text-white rounded-lg">
+                            Manage Passenger
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function addNewPassenger() {
+            const name = document.getElementById('passenger-name').value;
+            const flight = document.getElementById('passenger-flight').value;
+            const seat = document.getElementById('passenger-seat').value;
+            const passengerClass = document.getElementById('passenger-class').value;
+            
+            if (!name || !flight || !seat || !passengerClass) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            // Generate new passenger ID
+            const newId = 'PAX' + (1000 + passengers.length + 1);
+            
+            // Add new passenger
+            const newPassenger = {
+                id: newId,
+                name: name,
+                flight: flight,
+                seat: seat,
+                class: passengerClass,
+                status: 'Not Checked In'
+            };
+            
+            passengers.push(newPassenger);
+            
+            // Update the flight's booked count
+            const flightToUpdate = flights.find(f => f.id === flight);
+            if (flightToUpdate) {
+                flightToUpdate.booked += 1;
+            }
+            
+            // Update UI
+            populatePassengersTable();
+            updateDashboardStats();
+            
+            // Show success message
+            alert(`Passenger ${name} added successfully with ID: ${newId}`);
+            
+            // Return to passengers section
+            showSection('passengers');
+        }
+
+        // Initialize filters
+        document.getElementById('flight-status-filter').addEventListener('change', function() {
+            filterFlightsTable();
+        });
+
+        document.getElementById('flight-aircraft-filter').addEventListener('change', function() {
+            filterFlightsTable();
+        });
+
+        function filterFlightsTable() {
+            const statusFilter = document.getElementById('flight-status-filter').value;
+            const aircraftFilter = document.getElementById('flight-aircraft-filter').value;
+            
+            const filteredFlights = flights.filter(flight => {
+                return (statusFilter === 'all' || flight.status === statusFilter) &&
+                       (aircraftFilter === 'all' || flight.aircraft === aircraftFilter);
+            });
+            
+            const flightsTableBody = document.getElementById('flights-table-body');
+            flightsTableBody.innerHTML = '';
+            
+            filteredFlights.forEach(flight => {
+                const departureTime = new Date(flight.departure);
+                const arrivalTime = new Date(flight.arrival);
+                const duration = (arrivalTime - departureTime) / (1000 * 60 * 60);
+                const loadFactor = Math.round((flight.booked / flight.seats) * 100);
+                
+                const row = document.createElement('tr');
+                row.className = 'table-row';
+                row.innerHTML = `
+                    <td class="p-4 flight-id">${flight.id}</td>
+                    <td class="p-4">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 rounded-full bg-quantum-accent flex items-center justify-center mr-3">
+                                <i class="fas fa-plane-departure text-white text-sm"></i>
+                            </div>
+                            <span class="route-display">${flight.origin} → ${flight.destination}</span>
+                        </div>
+                    </td>
+                    <td class="p-4 time-display">${departureTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</td>
+                    <td class="p-4 time-display">${arrivalTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</td>
+                    <td class="p-4 duration-display">${duration.toFixed(1)} hrs</td>
+                    <td class="p-4 aircraft-display">${flight.aircraft}</td>
+                    <td class="p-4">
+                        ${flight.status === 'On Time' ? 
+                          '<span class="status-badge on-time"><i class="fas fa-check-circle"></i> On Time</span>' : 
+                          flight.status === 'Delayed' ? 
+                          '<span class="status-badge delayed"><i class="fas fa-clock"></i> Delayed</span>' : 
+                          flight.status === 'Boarding' ? 
+                          '<span class="status-badge boarding"><i class="fas fa-users"></i> Boarding</span>' : 
+                          '<span class="status-badge scheduled"><i class="fas fa-calendar"></i> Scheduled</span>'}
+                    </td>
+                    <td class="p-4">
+                        <div class="flex items-center">
+                            <div class="progress-bar w-full mr-2">
+                                <div class="progress-fill ${loadFactor > 90 ? 'high-load' : loadFactor > 70 ? 'medium-load' : 'low-load'}" style="width: ${loadFactor}%"></div>
+                            </div>
+                            <span class="text-xs text-quantum-accent">${loadFactor}%</span>
+                        </div>
+                    </td>
+                    <td class="p-4">
+                        <button onclick="viewFlightDetails('${flight.id}')" class="action-btn bg-quantum-primary hover:bg-quantum-secondary text-white px-3 py-1 rounded text-sm transition-colors">
+                            Details
+                        </button>
+                    </td>
+                `;
+                flightsTableBody.appendChild(row);
+            });
+        }
+
+        // Initialize the page when loaded
+        window.onload = initializePage;
+    </script>
+</body>
+</html>
